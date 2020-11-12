@@ -214,3 +214,4 @@ fabric.properties
 
 /data.js
 /chromedriver*
+/report_*
