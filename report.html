@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en_US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Olympiad Analysis</title>
+
+    <style>
+        :root {
+            --main: #483D8B;
+        }
+
+        *, *:before, *:after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            margin-bottom: 0.5em;
+        }
+
+        body {
+            background: #eeeeee;
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 50px;
+            color: #ffffff;
+            background-color: var(--main);
+            margin-bottom: 32px;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .table {
+            border-spacing: 0;
+            background-color: #ffffff;
+            border: 1px solid var(--main);
+            border-bottom: none;
+            font-size: 14pt;
+        }
+
+        .table thead {
+            background-color: var(--main);
+            color: #ffffff;
+            text-align: left;
+        }
+
+        .table td, th {
+            padding: 5px 10px;
+            border: none;
+            border-bottom: 1px solid var(--main);
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Olympiad Analysis</h1>
+</header>
+<main>
+</main>
+<script src="./data.js"></script>
+<script>
+    (function () {
+        const DATA = JSON.parse(GLOBAL_DATA);
+        if (DATA.color)
+            document.documentElement.style.setProperty('--main', DATA.color);
+        const tdf_values = DATA['task_difficulty'];
+
+        const subject = document.createElement('h4');
+        subject.appendChild(document.createTextNode(`Subject: ${DATA.subject}`));
+        document.getElementsByTagName('header')[0].appendChild(subject);
+
+        const tdf_header = ["Task no."];
+        const main = document.getElementsByTagName('main')[0];
+
+        for (let i = 0; i < tdf_values[0].length; i++)
+            tdf_header.push(`v${i + 1}`);
+        const tdf_h = document.createElement('h3');
+
+        tdf_h.appendChild(document.createTextNode("Tasks difficulty"));
+        main.appendChild(tdf_h);
+
+        generateTable(main, "taskdifficulty", tdf_header, tdf_values, true, DATA.color || "#483D8B");
+    })();
+
+    function generateTable(parent, tableid, header, body, coloring = true, MAIN_COLOR = "#483D8B", fc_num = true) {
+        const table = document.createElement("table");
+        table.id = tableid;
+        table.classList.add("table");
+
+        const thead = document.createElement("thead");
+        thead.className = 'thead-dark';
+
+        const tbody = document.createElement("tbody");
+        const thead_tr = document.createElement("tr");
+        const colorBody = body.flat()
+
+        colorBody.filter((it) => it)
+        colorBody.sort((a, b) => a - b)
+
+        for (const data of header) {
+            const th = document.createElement("th");
+            th.appendChild(document.createTextNode(data));
+            thead_tr.appendChild(th);
+        }
+
+        thead.appendChild(thead_tr);
+        table.appendChild(thead);
+
+        for (let i = 0; i < body.length; i++) {
+            const row = body[i];
+            if (fc_num)
+                row.unshift(i + 1);
+            const tr = document.createElement("tr");
+            for (const data of row) {
+                const td = document.createElement("td");
+                if (data) {
+                    td.style.backgroundColor = LightenDarkenColor(MAIN_COLOR, colorBody.indexOf(data) !== -1 ? ((colorBody.indexOf(data) * 100) / colorBody.length) * 1.5 : 255)
+                    td.appendChild(document.createTextNode(data));
+                } else {
+                    td.style.backgroundColor = '#eee';
+                    td.innerHTML = "&mdash;";
+                }
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        }
+
+        table.appendChild(tbody);
+        parent.appendChild(table);
+    }
+
+    function LightenDarkenColor(col, amt) {
+        let usePound = false;
+        if (col[0] === "#") {
+            col = col.slice(1);
+            usePound = true;
+        }
+        let num = parseInt(col, 16);
+        let r = (num >> 16) + amt;
+        if (r > 255) r = 255;
+        else if (r < 0) r = 0;
+        let b = ((num >> 8) & 0x00FF) + amt;
+        if (b > 255) b = 255;
+        else if (b < 0) b = 0;
+        let g = (num & 0x0000FF) + amt;
+        if (g > 255) g = 255;
+        else if (g < 0) g = 0;
+        return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
+    }
+</script>
+</body>
+</html>
