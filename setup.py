@@ -1,13 +1,21 @@
 import os
 import platform
+import subprocess
 import sys
 import zipfile
 
-import requests
-from PyInquirer import prompt
+try:
+    import requests
+    from PyInquirer import prompt
+except:
+    print("Required packages are not found. Installing..")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+    import requests
+    from PyInquirer import prompt
 
 
 def setup():
+    print("ChromeDriver not found. Launching installation process..")
     system = platform.uname().system.lower()
     if system == 'darwin':
         system = 'macos'
@@ -38,7 +46,10 @@ def setup():
         print('Downloading ChromeDriver...')
         response = requests.get(
             'https://chromedriver.storage.googleapis.com/85.0.4183.87/chromedriver_%s.zip' % answers['system'],
-            stream=True)
+            stream=True, proxies={
+                "http": os.getenv("http_proxy", None),
+                "https": os.getenv("https_proxy", os.getenv("http_proxy", None))
+            })
         total_length = response.headers.get('content-length')
 
         if total_length is None:

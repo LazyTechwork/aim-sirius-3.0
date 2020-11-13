@@ -1,11 +1,22 @@
 import argparse
 import json
 import os
+import subprocess
+import sys
 from datetime import datetime
 
-from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+try:
+    from bs4 import BeautifulSoup
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
+except:
+    print("Required packages are not found. Installing..")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+    print("Trying to import again..")
+    from bs4 import BeautifulSoup
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
+    print("Import successful. Launching script..")
 
 import setup
 

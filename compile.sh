@@ -1,1 +1,0 @@
-pyinstaller generate_report.py --distpath "./" -y --clean -F
