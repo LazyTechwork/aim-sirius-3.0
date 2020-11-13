@@ -1,51 +1,63 @@
 import os
-import platform
 import subprocess
 import sys
 import zipfile
 
 try:
     import requests
-    from PyInquirer import prompt
+    import urllib.request
+    import urllib.parse
+    import chromedriver_autoinstaller
+    import xml.etree.ElementTree as elemTree
 except:
     print("Required packages are not found. Installing..")
     subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
     import requests
-    from PyInquirer import prompt
+    import urllib.request
+    import urllib.parse
+    import chromedriver_autoinstaller.utils
+    import xml.etree.ElementTree as elemTree
+
+
+def chromedriver_major(version):
+    return version.split('.')[0]
+
+
+def get_chromedriver_version(version):
+    proxies = {
+        "http": os.getenv("http_proxy", None),
+        "https": os.getenv("https_proxy", os.getenv("http_proxy", None))
+    }
+    req = urllib.request.Request('https://chromedriver.storage.googleapis.com/')
+    if proxies['http']:
+        req.set_proxy(proxies['http'], "http")
+    if proxies['https']:
+        req.set_proxy(proxies['https'], "https")
+    doc = urllib.request.urlopen(req).read()
+    root = elemTree.fromstring(doc)
+    for k in root.iter('{http://doc.s3.amazonaws.com/2006-03-01}Key'):
+        if k.text.find(chromedriver_major(version) + '.') == 0:
+            return k.text.split('/')[0]
+    return
 
 
 def setup():
     print("ChromeDriver not found. Launching installation process..")
-    system = platform.uname().system.lower()
-    if system == 'darwin':
-        system = 'macos'
-
-    osystems = ['Windows', 'MacOS', 'Linux']
-    si = list(map(lambda it: it.lower(), osystems)).index(system)
-    osystems[si], osystems[0] = osystems[0], osystems[si]
-    print('Detected OS:', osystems[0])
-    questions = [
-        {
-            'type': 'list',
-            'message': 'Select your OS',
-            'name': 'system',
-            'choices': [{'name': it} for it in osystems]
-        }
-    ]
-
-    answers = prompt(questions)
-    print('Selected OS:', answers['system'])
-    if answers['system'] == 'MacOS':
-        answers['system'] = 'mac64'
-    elif answers['system'] == 'Windows':
-        answers['system'] = 'win32'
-    elif answers['system'] == 'Linux':
-        answers['system'] = 'linux64'
-
+    chrome_version = chromedriver_autoinstaller.utils.get_chrome_version()
+    if not chrome_version:
+        print("Chrome isn't installed. Script is shutting down..")
+        exit(0)
+    chromedriver_version = get_chromedriver_version(chrome_version)
+    if not chromedriver_version:
+        print("Can not find chromedriver for currently installed chrome version.")
+        exit(0)
+    url = chromedriver_autoinstaller.utils.get_chromedriver_url(chromedriver_version)
+    print("Installing ChromeDriver v" + chromedriver_version)
+    print(url)
     with open('chromedriver.zip', "wb") as f:
         print('Downloading ChromeDriver...')
         response = requests.get(
-            'https://chromedriver.storage.googleapis.com/85.0.4183.87/chromedriver_%s.zip' % answers['system'],
+            url,
             stream=True, proxies={
                 "http": os.getenv("http_proxy", None),
                 "https": os.getenv("https_proxy", os.getenv("http_proxy", None))
