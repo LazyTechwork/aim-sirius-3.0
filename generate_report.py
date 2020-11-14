@@ -25,7 +25,6 @@ except:
 parser = argparse.ArgumentParser(description='Generate HTML report from Olympiad Analysis')
 parser.add_argument('-i', dest='input', action='store',
                     help='Specify input file', required=True)
-parser.add_argument('--driver', action='store', help='Path to ChromeDriver')
 
 args = parser.parse_args()
 with open(args.input, "r") as file:
@@ -43,7 +42,7 @@ chrome_options = Options()
 chrome_options.add_argument("--disable-extensions")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--headless")
-driver = webdriver.Chrome(options=chrome_options, executable_path=(args.driver or "chromedriver"))
+driver = webdriver.Chrome(options=chrome_options)
 
 driver.get(r'file://{0}/report.html'.format(FILEPATH))
 driver.implicitly_wait(2)
