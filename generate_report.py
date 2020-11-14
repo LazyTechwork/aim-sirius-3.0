@@ -32,7 +32,6 @@ with open(args.input, "r") as file:
 with open("data.js", "w+") as file:
     file.write('const GLOBAL_DATA = `' + json.dumps(data) + '`;' + "\n")
 
-os.chdir(os.path.dirname(__file__))
 FILEPATH = os.getcwd()
 
 if not (os.path.exists('chromedriver.exe') or os.path.exists('chromedriver')):
