@@ -43,7 +43,7 @@ data = {
 
 data['blocks'].append(funcs.call_read_return(funcs, "make_answers_count_block", args.input))
 data['blocks'].append(funcs.call_read_return(funcs, "make_fraction_for_task_num_block", args.input))
-# data['blocks'].append(funcs.call_read_return(kseniia, "optimization", args.input))
+data['blocks'].append(funcs.call_read_return(kseniia, "optimization", args.input))
 data['blocks'].append(funcs.call_read_return(daiwik, "main_function", args.input))
 print("Calling function getOlympiadScores")
 f = getattr(gleb, "getOlympiadScores")
@@ -60,7 +60,6 @@ with open("getOlympiadScores_scores.json", "r", encoding='utf-8') as file:
 os.remove("getOlympiadScores_scores.json")
 print("Got result from getOlympiadScores")
 print("Making common JSON...")
-print(json.dumps(data))
 
 with open("data.js", "w+", encoding='utf-8') as file:
     file.write('const GLOBAL_DATA = `' + json.dumps(data) + '`;' + "\n")
@@ -78,15 +77,19 @@ chrome_options.add_argument("--headless")
 driver = webdriver.Chrome(options=chrome_options)
 
 driver.get(r'file://{0}/report.html'.format(FILEPATH))
+print("Generating HTML page...")
 driver.implicitly_wait(2)
 html = BeautifulSoup(driver.page_source, 'html.parser')
 
 for s in html.select('script'):
     s.extract()
+    print("Got HTML page, extracting tables...")
 
-with open("report_" + args.subject + "_" + datetime.now().strftime("%Y-%m-%d_%H.%M.%S") + ".html", "w+",
+html_filename = "report_" + args.subject + "_" + datetime.now().strftime("%Y-%m-%d_%H.%M.%S") + ".html"
+with open(html_filename, "w+",
           encoding='utf-8') as file:
     file.write(html.prettify())
+    print("Report saved in {0}".format(html_filename))
 
 if os.path.exists('data.js'):
     os.remove('data.js')
