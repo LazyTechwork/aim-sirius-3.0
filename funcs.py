@@ -10,7 +10,7 @@ import os
 def call_read_return(imp, func, src):
     f = getattr(imp, func)
     f(src, "{0}.json".format(func))
-    with open("{0}.json".format(func), "r") as file:
+    with open("{0}.json".format(func), "r", encoding='utf-8') as file:
         obj = json.load(file)
         obj['id'] = func
     os.remove("{0}.json".format(func))

@@ -41,7 +41,7 @@ data = {
 data['blocks'].append(funcs.call_read_return(funcs, "make_answers_count_block", args.input))
 data['blocks'].append(funcs.call_read_return(funcs, "make_fraction_for_task_num_block", args.input))
 
-with open("data.js", "w+") as file:
+with open("data.js", "w+", encoding='utf-8') as file:
     file.write('const GLOBAL_DATA = `' + json.dumps(data) + '`;' + "\n")
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -63,7 +63,7 @@ html = BeautifulSoup(driver.page_source, 'html.parser')
 for s in html.select('script'):
     s.extract()
 
-with open("report_" + datetime.now().strftime("%Y-%m-%d_%H.%M.%S") + ".html", "w+") as file:
+with open("report_" + args.subject + "_" + datetime.now().strftime("%Y-%m-%d_%H.%M.%S") + ".html", "w+", encoding='utf-8') as file:
     file.write(html.prettify())
 
 if os.path.exists('data.js'):
