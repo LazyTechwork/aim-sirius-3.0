@@ -3,6 +3,10 @@ import json
 import os
 
 
+# import numpy as np
+# import pandas as pd
+
+
 def call_read_return(imp, func, src):
     f = getattr(imp, func)
     f(src, "{0}.json".format(func))
@@ -69,7 +73,7 @@ def make_fraction_for_task_num_block(src_dir, out_file_path):
     result_by_task_num = {}
     for task_id, cnt in task_id_to_cnt.items():
         cnt_ok = task_id_to_ok_cnt.get(task_id, 0)
-        [num, variant] = task_id_to_num[task_id].split('-')
+        [num, _] = task_id_to_num[task_id].split('-')
         (cur_cnt, cur_cnt_ok) = result_by_task_num.get(num, (0, 0))
         result_by_task_num[num] = (cur_cnt + cnt, cur_cnt_ok + cnt_ok)
     data = {}
@@ -84,3 +88,83 @@ def make_fraction_for_task_num_block(src_dir, out_file_path):
     }
     with open(out_file_path, 'w', encoding='utf-8') as f:
         json.dump(json_result, f, ensure_ascii=False, indent=4)
+
+
+'''
+# Function to read csv file given name in first cmd option
+def read_file(file_name):
+    data = pd.read_csv(file_name, delimiter=',')  # separation
+    return data
+
+
+def get_json_for_attempt_count(data, id_data):
+    data.loc[:, 'attempt_count'] = np.where(data.loc[:, 'verdict'] != 'none', 1, 0)  # adding a new column
+    level_columns = ['task_no', 'task_id']
+    id_data.rename(columns={'task_no': 'task_names', 'id': 'task_id'}, inplace=True)
+    data = pd.merge(id_data, data, on='task_id', how='inner')
+    data[['task_no', 'task_id']] = data.task_names.str.split("-", expand=True)
+    avg_data = data.groupby(['task_no', 'task_id']).agg({'attempt_count': ['sum']})  # adding all partly
+    avg_data.columns = avg_data.columns.droplevel(1)
+    avg_data = avg_data.reset_index()
+    print(avg_data.head())
+    all_column = ['attempt_count']
+    result = dict()
+    for row in avg_data.itertuples():
+        tmp_result = result
+        for i in range(len(level_columns)):
+            val = getattr(row, level_columns[i])
+            if val not in tmp_result:
+                tmp_result[val] = {}
+            tmp_result = tmp_result[val]
+        for column in all_column:
+            if column not in level_columns:
+                tmp_result[column] = getattr(row, column)
+    return result
+
+
+def get_json_for_fraction(data):
+    data['percentage'] = data['score'] / data['max_score']
+    avg_data = data.groupby(['task_no']).agg({'percentage': ['mean']})  # adding all partly
+    avg_data.columns = avg_data.columns.droplevel(1)
+    avg_data = avg_data.reset_index()
+    result = dict()
+    for row in avg_data.itertuples():
+        result[getattr(row, 'task_no')] = getattr(row, 'percentage')
+    return result
+
+
+# Convert data in dataframe format to json format
+def convert_to_json(data):
+    return json.loads(data.to_json(orient='index'))
+
+
+# Write json to file
+def write_json_to_file(json_data, file_name):
+    file_object = open(file_name, "w+")
+    json.dump(json_data, file_object, indent=4)
+
+
+def compute_fraction_data(csv_file_name, json_file_name):
+    data = read_file(csv_file_name)
+    json_obj = get_json_for_fraction(data)
+    final_json = {
+        'title': 'Fraction of correct answers',
+        'data_type': '',
+        'render_type': 'color-gradient-asc',
+        'data': json_obj
+    }
+    write_json_to_file(final_json, json_file_name)
+
+
+def compute_attempt_count_data(csv_file_name, ids_data_file_name, json_file_name):
+    data = read_file(csv_file_name)
+    ids = read_file(ids_data_file_name)
+    json_obj = get_json_for_attempt_count(data, ids)
+    final_json = {
+        'title': 'Non-empty answers count',
+        'data_type': '',
+        'render_type': 'color-gradient-asc',
+        'data': json_obj
+    }
+    write_json_to_file(final_json, json_file_name)
+'''
