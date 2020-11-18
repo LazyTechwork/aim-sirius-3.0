@@ -38,13 +38,6 @@ data = {
     'blocks': list()
 }
 
-# funcs.make_answers_count_block(args.input, "make_answers_count_block.json")
-# with open("make_answers_count_block.json", "r") as file:
-#     obj = json.load(file)
-#     obj['id'] = 'make_answers_count_block'
-#     data['blocks'].append(obj)
-# os.remove("make_answers_count_block.json")
-
 data['blocks'].append(funcs.call_read_return(funcs, "make_answers_count_block", args.input))
 data['blocks'].append(funcs.call_read_return(funcs, "make_fraction_for_task_num_block", args.input))
 
