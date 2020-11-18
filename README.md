@@ -1,26 +1,18 @@
 # AIM-Sirius 3.0 - Distance Education
 
 ### Report generation
+#### About script
+* Script filename &mdash; `generate_report.py`
+* `-i` &mdash; Directory where `results.csv` and `task_ids.csv` are (**required**)
+* `-s` &mdash; Specify subject of Olympiad to render it in report (_default_: `Mathematics`)
+* `-c` &mdash; Specify custom color scheme to generate (_default_: `#483D8B`)
+
+#### Example
 > Script will automatically download all required files and packages.
 
-You need to generate data analysis report in json format. So, it's look like this:
-```json
-{
-  "color": "#67b811",
-  "subject": "Mathematics",
-  "task_difficulty": [
-    [660,687,692,713],...
-  ]
-}
-```
+* Linux/MacOS: `python3 .\generate_report.py -i .\data\mathematics\`
+* Windows: `python .\generate_report.py -i .\data\mathematics\`
 
-In `color` you can set the main color scheme of report.
+#### Result
+After script finish you'll get html report file with creation date.
 
-In `subject` you can set the name of subject of the olympiad.
-
-`task_difficulty` is n&times;n matrix with task_difficulty by tasks and variants. The row is the task, the column is the variant.
-
-#### How to generate?
-To generate report you'll need to run `python3 generate_report.py -i <JSON report file>`. Example: `python3 .\generate_report.py -i report.json`. After script finish you'll get html report file with creation date.
-
-> **IMPORTANT!** You need to use Python executable suitable for your operating system
