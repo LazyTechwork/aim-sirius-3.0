@@ -20,16 +20,16 @@ def make_answers_count_block(src_dir, out_file_path):
         for row in reader:
             if row['verdict'] == 'none':
                 continue
-        task_id = int(row['task_id'])
-        cnt = task_id_to_cnt.get(task_id, 0)
-        task_id_to_cnt[task_id] = cnt + 1
+            task_id = int(row['task_id'])
+            cnt = task_id_to_cnt.get(task_id, 0)
+            task_id_to_cnt[task_id] = cnt + 1
 
     task_id_to_num = {}
     with open(src_dir + '/task_ids.csv', encoding='utf-8') as f:
         reader = csv.DictReader(f, delimiter=',')
         for row in reader:
             task_id = int(row['id'])
-        task_id_to_num[task_id] = row['task_no']
+            task_id_to_num[task_id] = row['task_no']
     data = {}
     for task_id, cnt in task_id_to_cnt.items():
         [num, variant] = task_id_to_num[task_id].split('-')
