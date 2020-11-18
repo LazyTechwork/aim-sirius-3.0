@@ -7,6 +7,7 @@ import sys
 from datetime import datetime
 
 import setup
+import funcs
 
 try:
     from bs4 import BeautifulSoup
@@ -24,11 +25,29 @@ except:
 
 parser = argparse.ArgumentParser(description='Generate HTML report from Olympiad Analysis')
 parser.add_argument('-i', dest='input', action='store',
-                    help='Specify input file', required=True)
+                    help='Specify input directory', required=True)
+parser.add_argument('-s', dest='subject', action='store',
+                    help='Specify subject', default="Mathematics")
+parser.add_argument('-c', dest='color', action='store',
+                    help='Specify color', default="#483D8B")
 
 args = parser.parse_args()
-with open(args.input, "r") as file:
-    data = json.load(file)
+data = {
+    'subject': args.subject,
+    'color': args.color,
+    'blocks': list()
+}
+
+# funcs.make_answers_count_block(args.input, "make_answers_count_block.json")
+# with open("make_answers_count_block.json", "r") as file:
+#     obj = json.load(file)
+#     obj['id'] = 'make_answers_count_block'
+#     data['blocks'].append(obj)
+# os.remove("make_answers_count_block.json")
+
+data['blocks'].append(funcs.call_read_return(funcs, "make_answers_count_block", args.input))
+data['blocks'].append(funcs.call_read_return(funcs, "make_fraction_for_task_num_block", args.input))
+
 with open("data.js", "w+") as file:
     file.write('const GLOBAL_DATA = `' + json.dumps(data) + '`;' + "\n")
 
@@ -56,8 +75,6 @@ with open("report_" + datetime.now().strftime("%Y-%m-%d_%H.%M.%S") + ".html", "w
 
 if os.path.exists('data.js'):
     os.remove('data.js')
-if os.path.exists('debug.log'):
-    os.remove('debug.log')
 
 try:
     driver.close()

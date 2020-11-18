@@ -62,6 +62,13 @@
             border: none;
             border-bottom: 1px solid var(--main);
         }
+
+        .block {
+            margin: 25px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -76,58 +83,114 @@
         const DATA = JSON.parse(GLOBAL_DATA);
         if (DATA.color)
             document.documentElement.style.setProperty('--main', DATA.color);
-        const tdf_values = DATA['task_difficulty'];
-
         const subject = document.createElement('h4');
         subject.appendChild(document.createTextNode(`Subject: ${DATA.subject}`));
         document.getElementsByTagName('header')[0].appendChild(subject);
 
-        const tdf_header = ["Task no."];
-        const main = document.getElementsByTagName('main')[0];
+        const main = document.getElementsByTagName("main")[0];
 
-        for (let i = 0; i < tdf_values[0].length; i++)
-            tdf_header.push(`v${i + 1}`);
-        const tdf_h = document.createElement('h3');
-
-        tdf_h.appendChild(document.createTextNode("Tasks difficulty"));
-        main.appendChild(tdf_h);
-
-        generateTable(main, "taskdifficulty", tdf_header, tdf_values, true, DATA.color || "#483D8B");
+        for (const datumKey in DATA["blocks"]) {
+            if (!DATA["blocks"].hasOwnProperty(datumKey))
+                continue;
+            const block = DATA["blocks"][datumKey];
+            generateBlock({parent: main, ...block, color: DATA.color});
+        }
     })();
 
-    function generateTable(parent, tableid, header, body, coloring = true, MAIN_COLOR = "#483D8B", fc_num = true) {
+    function generateBlock({parent, title, data_type, render_type, data, id, color}) {
+        const thead = [];
+        switch (data_type) {
+            case 'value_for_each_task':
+                const variants = Math.max(...Object.values(data).map(el => Object.keys(el).length));
+                thead.push("task", ...new Array(variants).fill(null, 0, variants).map((_, index) => `v${index + 1}`))
+                break;
+            default:
+            case 'value_for_each_task_number':
+                thead.push("task", "score");
+                break;
+        }
+
+        const body = [];
+        let palette = [];
+        for (const dataKey in data) {
+            if (!data.hasOwnProperty(dataKey))
+                continue;
+            if (typeof data[dataKey] === "string" || typeof data[dataKey] === "number") {
+                body.push([dataKey, data[dataKey]])
+                palette.push([data[dataKey]])
+            } else if (typeof data[dataKey] === "object") {
+                const datumKeys = Object.keys(data[dataKey]).sort((a, b) => {
+                    a = parseInt(a);
+                    b = parseInt(b);
+                    if (a < b) return -1;
+                    else if (a > b) return 1;
+                    else return 0;
+                });
+                const datumValues = [];
+                for (const datumKey of datumKeys) {
+                    if (!data[dataKey].hasOwnProperty(datumKey))
+                        continue;
+                    datumValues.push(data[dataKey][datumKey]);
+                }
+                body.push([dataKey, ...datumValues]);
+                palette.push([...datumValues]);
+            }
+        }
+
+        palette = [...new Set(palette.flat(1))]
+        switch (render_type) {
+            case 'color-gradient-asc':
+                palette.sort((a, b) => b - a)
+                break;
+            default:
+            case 'color-gradient-desc':
+                palette.sort((a, b) => a - b)
+                break;
+        }
+
+        const block = document.createElement("div");
+        block.classList.add("block");
+        const h4 = document.createElement("h4");
+        h4.appendChild(document.createTextNode(title));
+        block.appendChild(h4);
+        block.appendChild(generateTableFromBlock(`${id}_${randomString(12)}`, thead, body, palette, color));
+        parent.appendChild(block);
+    }
+
+    function generateTableFromBlock(table_id, header, body, colorValuePalette, color) {
+        const parent = document.getElementsByTagName("main")[0];
+
+        // Creating table
         const table = document.createElement("table");
-        table.id = tableid;
+        table.id = table_id;
         table.classList.add("table");
 
+        // Creating table header
         const thead = document.createElement("thead");
-        thead.className = 'thead-dark';
-
-        const tbody = document.createElement("tbody");
         const thead_tr = document.createElement("tr");
-        const colorBody = body.flat()
-
-        colorBody.filter((it) => it)
-        colorBody.sort((a, b) => a - b)
-
         for (const data of header) {
             const th = document.createElement("th");
             th.appendChild(document.createTextNode(data));
             thead_tr.appendChild(th);
         }
-
         thead.appendChild(thead_tr);
         table.appendChild(thead);
 
-        for (let i = 0; i < body.length; i++) {
-            const row = body[i];
-            if (fc_num)
-                row.unshift(i + 1);
+        // Creating table body
+        const tbody = document.createElement("tbody");
+        for (const bodyElement of body) {
             const tr = document.createElement("tr");
-            for (const data of row) {
+            for (let i = 0; i < bodyElement.length; i++) {
                 const td = document.createElement("td");
-                if (data) {
-                    td.style.backgroundColor = LightenDarkenColor(MAIN_COLOR, colorBody.indexOf(data) !== -1 ? ((colorBody.indexOf(data) * 100) / colorBody.length) * 1.5 : 255)
+                const data = bodyElement[i];
+                if (i === 0) {
+                    td.style.backgroundColor = "#fff";
+                    td.appendChild(document.createTextNode(data));
+                } else if (data) {
+                    const bgColor = LightenDarkenColor(color, colorValuePalette.indexOf(data) !== -1 ? (((colorValuePalette.indexOf(data) * 100) / colorValuePalette.length) * 1.5) + 20 : 255);
+                    td.style.backgroundColor = bgColor
+                    if (getLumens(bgColor) < 150)
+                        td.style.color = "#fff";
                     td.appendChild(document.createTextNode(data));
                 } else {
                     td.style.backgroundColor = '#eee';
@@ -137,9 +200,18 @@
             }
             tbody.appendChild(tr);
         }
-
         table.appendChild(tbody);
-        parent.appendChild(table);
+        return table;
+    }
+
+    function randomString(length) {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
     }
 
     function LightenDarkenColor(col, amt) {
@@ -159,6 +231,15 @@
         if (g > 255) g = 255;
         else if (g < 0) g = 0;
         return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
+    }
+
+    function getLumens(c) {
+        c = c.substring(1);
+        const rgb = parseInt(c, 16);
+        const r = (rgb >> 16) & 0xff;
+        const g = (rgb >> 8) & 0xff;
+        const b = (rgb >> 0) & 0xff;
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
     }
 </script>
 </body>
