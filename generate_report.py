@@ -8,6 +8,9 @@ from datetime import datetime
 
 import setup
 import funcs
+import kseniia
+import daiwik
+import gleb
 
 try:
     from bs4 import BeautifulSoup
@@ -40,6 +43,24 @@ data = {
 
 data['blocks'].append(funcs.call_read_return(funcs, "make_answers_count_block", args.input))
 data['blocks'].append(funcs.call_read_return(funcs, "make_fraction_for_task_num_block", args.input))
+# data['blocks'].append(funcs.call_read_return(kseniia, "optimization", args.input))
+data['blocks'].append(funcs.call_read_return(daiwik, "main_function", args.input))
+print("Calling function getOlympiadScores")
+f = getattr(gleb, "getOlympiadScores")
+f(args.input, "getOlympiadScores_")
+with open("getOlympiadScores_act_opt.json", "r", encoding='utf-8') as file:
+    obj = json.load(file)
+    obj['id'] = "getOlympiadScores_act_opt"
+    data['blocks'].append(obj)
+os.remove("getOlympiadScores_act_opt.json")
+with open("getOlympiadScores_scores.json", "r", encoding='utf-8') as file:
+    obj = json.load(file)
+    obj['id'] = "getOlympiadScores_scores"
+    data['blocks'].append(obj)
+os.remove("getOlympiadScores_scores.json")
+print("Got result from getOlympiadScores")
+print("Making common JSON...")
+print(json.dumps(data))
 
 with open("data.js", "w+", encoding='utf-8') as file:
     file.write('const GLOBAL_DATA = `' + json.dumps(data) + '`;' + "\n")
@@ -63,7 +84,8 @@ html = BeautifulSoup(driver.page_source, 'html.parser')
 for s in html.select('script'):
     s.extract()
 
-with open("report_" + args.subject + "_" + datetime.now().strftime("%Y-%m-%d_%H.%M.%S") + ".html", "w+", encoding='utf-8') as file:
+with open("report_" + args.subject + "_" + datetime.now().strftime("%Y-%m-%d_%H.%M.%S") + ".html", "w+",
+          encoding='utf-8') as file:
     file.write(html.prettify())
 
 if os.path.exists('data.js'):

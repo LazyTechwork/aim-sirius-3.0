@@ -190,7 +190,7 @@
                 if (i === 0) {
                     td.style.backgroundColor = "#fff";
                     td.appendChild(document.createTextNode(data));
-                } else if (data) {
+                } else if (data || typeof data === "number") {
                     const bgColor = LightenDarkenColor(color, colorValuePalette.indexOf(data) !== -1 ? (((colorValuePalette.indexOf(data) * 100) / colorValuePalette.length) * 1.5) + 20 : 255);
                     td.style.backgroundColor = bgColor
                     if (getLumens(bgColor) < 150)
