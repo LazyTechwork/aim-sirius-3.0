@@ -136,6 +136,10 @@
                 palette.push([...datumValues]);
             }
         }
+        const cols = Math.max(...body.map(el => el.length));
+        for (const row of body)
+            if (row.length !== cols)
+                row.push(...new Array(cols - row.length).fill(null, 0, cols - row.length - 1))
 
         palette = [...new Set(palette.flat(1))]
         switch (render_type) {
