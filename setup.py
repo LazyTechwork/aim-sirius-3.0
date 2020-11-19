@@ -1,4 +1,5 @@
 import os
+import ssl
 import subprocess
 import sys
 import zipfile
@@ -28,12 +29,13 @@ def get_chromedriver_version(version):
         "http": os.getenv("http_proxy", None),
         "https": os.getenv("https_proxy", os.getenv("http_proxy", None))
     }
-    req = urllib.request.Request('https://chromedriver.storage.googleapis.com/', unverifiable=True)
+    req = urllib.request.Request('https://chromedriver.storage.googleapis.com/')
+    g_context = ssl.SSLContext()
     if proxies['http']:
         req.set_proxy(proxies['http'], "http")
     if proxies['https']:
         req.set_proxy(proxies['https'], "https")
-    doc = urllib.request.urlopen(req).read()
+    doc = urllib.request.urlopen(req, context=g_context).read()
     root = elemTree.fromstring(doc)
     for k in root.iter('{http://doc.s3.amazonaws.com/2006-03-01}Key'):
         if k.text.find(chromedriver_major(version) + '.') == 0:
