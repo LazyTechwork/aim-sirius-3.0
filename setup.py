@@ -28,7 +28,7 @@ def get_chromedriver_version(version):
         "http": os.getenv("http_proxy", None),
         "https": os.getenv("https_proxy", os.getenv("http_proxy", None))
     }
-    req = urllib.request.Request('https://chromedriver.storage.googleapis.com/')
+    req = urllib.request.Request('https://chromedriver.storage.googleapis.com/', unverifiable=True)
     if proxies['http']:
         req.set_proxy(proxies['http'], "http")
     if proxies['https']:
