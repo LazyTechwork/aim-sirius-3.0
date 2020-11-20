@@ -11,6 +11,7 @@ import funcs
 import kseniia
 import daiwik
 import gleb
+import harsh_siddharth
 
 try:
     from chromedriver_autoinstaller.utils import get_platform_architecture
@@ -47,6 +48,10 @@ data['blocks'].append(funcs.call_read_return(funcs, "make_answers_count_block", 
 data['blocks'].append(funcs.call_read_return(funcs, "make_fraction_for_task_num_block", args.input))
 data['blocks'].append(funcs.call_read_return(kseniia, "optimization", args.input))
 data['blocks'].append(funcs.call_read_return(daiwik, "main_function", args.input))
+data['blocks'].append(funcs.call_read_return(daiwik, "bad_tasks", args.input))
+data['blocks'].append(funcs.call_read_return(harsh_siddharth, "compute_fraction_data", args.input))
+data['blocks'].append(funcs.call_read_return(harsh_siddharth, "compute_attempt_count_data", args.input))
+data['blocks'].append(funcs.call_read_return(harsh_siddharth, "make_fraction_for_task_block", args.input))
 print("Calling function getOlympiadScores")
 f = getattr(gleb, "getOlympiadScores")
 f(args.input, "getOlympiadScores_")

@@ -1,3 +1,5 @@
+import csv
+
 import pandas as pd
 import random
 import math
@@ -13,17 +15,28 @@ def optimization(src_dir, out_file_path):
     nums = list(partscor['points'])
     uniq.sort()
 
-    n = list(set(list(data['task_no'])))
-    n.sort(reverse=True)
-    n = n[0]
+    task_num_to_task_ids = {}
+
+    with open(src_dir + '/task_ids.csv', encoding='utf-8') as f:
+        reader = csv.DictReader(f, delimiter=',')
+        for row in reader:
+            task_id = int(row['id'])
+            key = int(row['task_no'].split("-")[0])
+
+            if key not in task_num_to_task_ids:
+                task_num_to_task_ids[key] = []
+
+            task_num_to_task_ids[key].append(task_id)
+
+    n = len(task_num_to_task_ids)
     peop = len(list(set(list(data['session_id']))))
     a = len(nums)
     pp = 25
-    dif = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    dif = [0.5] * n
     res = []
     c = 0.01  # step for changing difficulties
     dist = []
-    it = 30  # iterations
+    it = 200  # iterations
 
     def f(p, num):
         n = math.ceil(len(
@@ -55,6 +68,7 @@ def optimization(src_dir, out_file_path):
     def opt(difg):
         for i in range(1):
             for i in range(it):
+                print(f'Optimal difficulties. Iteration {i + 1}/{it}', flush=True)
                 l = 0
                 c = 0.01
                 # random.seed(i)
@@ -89,8 +103,9 @@ def optimization(src_dir, out_file_path):
 
     # return opt(dif)
     rr = {}
+    res_opt = opt(dif)
     for i in range(n):
-        rr[str(i + 1)] = opt(dif)[i]
+        rr[str(i + 1)] = round(res_opt[i], 2)
 
     json_result = {
         'title': 'Optimal difficulty for each task',
