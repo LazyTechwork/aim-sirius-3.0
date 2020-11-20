@@ -56,7 +56,13 @@ def setup():
     url = chromedriver_autoinstaller.utils.get_chromedriver_url(chromedriver_version)
     print("Installing ChromeDriver v" + chromedriver_version)
     print(url)
-    with open('chromedriver.zip', "wb") as f:
+
+    platform, _ = chromedriver_autoinstaller.utils.get_platform_architecture()
+    if platform == 'mac':
+        chromedriver_save_path = '/usr/local/bin/chromedriver.zip'
+    else:
+        chromedriver_save_path = 'chromedriver.zip'
+    with open(chromedriver_save_path, "wb") as f:
         print('Downloading ChromeDriver...')
         response = requests.get(
             url,
@@ -78,8 +84,8 @@ def setup():
                 sys.stdout.write("\r[%s%s] %d/100" % ('=' * done, ' ' * (100 - done), done))
                 sys.stdout.flush()
 
-    with zipfile.ZipFile('chromedriver.zip', 'r') as file:
+    with zipfile.ZipFile(chromedriver_save_path, 'r') as file:
         file.extractall('./')
 
-    if os.path.exists('chromedriver.zip'):
-        os.remove('chromedriver.zip')
+    if os.path.exists(chromedriver_save_path):
+        os.remove(chromedriver_save_path)

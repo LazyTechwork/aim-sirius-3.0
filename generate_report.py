@@ -81,11 +81,7 @@ chrome_options = Options()
 chrome_options.add_argument("--disable-extensions")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--headless")
-platform, _ = get_platform_architecture()
-if platform == 'mac':
-    driver = webdriver.Chrome(options=chrome_options, executable_path=os.getcwd() + "/chromedriver")
-else:
-    driver = webdriver.Chrome(options=chrome_options)
+driver = webdriver.Chrome(options=chrome_options)
 
 driver.get(r'file://{0}/report.html'.format(FILEPATH))
 print("Generating HTML page...")
