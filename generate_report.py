@@ -74,6 +74,8 @@ FILEPATH = os.getcwd()
 
 if not (os.path.exists('chromedriver.exe') or os.path.exists('chromedriver')):
     setup.setup()
+else:
+    setup.specify_path()
 
 chrome_options = Options()
 chrome_options.add_argument("--disable-extensions")
@@ -88,7 +90,7 @@ html = BeautifulSoup(driver.page_source, 'html.parser')
 
 for s in html.select('script'):
     s.extract()
-    print("Got HTML page, extracting tables...")
+print("Got HTML page, extracting tables...")
 
 html_filename = "report_" + args.subject + "_" + datetime.now().strftime("%Y-%m-%d_%H.%M.%S") + ".html"
 with open(html_filename, "w+",
