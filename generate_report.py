@@ -74,14 +74,20 @@ with open("data.js", "w+", encoding='utf-8') as file:
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 FILEPATH = os.getcwd()
 
-if not (os.path.exists('chromedriver.exe') or os.path.exists('chromedriver')):
+platform, _ = get_platform_architecture()
+if platform == 'mac' and not os.path.exists('/usr/local/bin/chromedriver'):
+    setup.setup()
+elif not (os.path.exists('chromedriver.exe') or os.path.exists('chromedriver')):
     setup.setup()
 
 chrome_options = Options()
 chrome_options.add_argument("--disable-extensions")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--headless")
-driver = webdriver.Chrome(options=chrome_options)
+if platform == 'mac':
+    driver = webdriver.Chrome(options=chrome_options, executable_path='/usr/local/bin/chromedriver')
+else:
+    driver = webdriver.Chrome(options=chrome_options)
 
 driver.get(r'file://{0}/report.html'.format(FILEPATH))
 print("Generating HTML page...")
