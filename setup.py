@@ -85,11 +85,13 @@ def setup():
     if os.path.exists("chromedriver.zip"):
         os.remove("chromedriver.zip")
 
+    specify_path()
+
 
 def specify_path():
     platform, _ = chromedriver_autoinstaller.utils.get_platform_architecture()
     if platform == 'mac' or platform == 'linux':
-        chromedriver_dir = os.getcwd() + "/chromedriver"
+        chromedriver_dir = os.getcwd()
         if 'PATH' not in os.environ:
             os.environ['PATH'] = chromedriver_dir
         elif chromedriver_dir not in os.environ['PATH']:
