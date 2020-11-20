@@ -42,8 +42,8 @@ data = {
     'blocks': list()
 }
 
-data['blocks'].append(funcs.call_read_return(funcs, "make_answers_count_block", args.input))
-data['blocks'].append(funcs.call_read_return(funcs, "make_fraction_for_task_num_block", args.input))
+# data['blocks'].append(funcs.call_read_return(funcs, "make_answers_count_block", args.input))
+# data['blocks'].append(funcs.call_read_return(funcs, "make_fraction_for_task_num_block", args.input))
 data['blocks'].append(funcs.call_read_return(kseniia, "optimization", args.input))
 data['blocks'].append(funcs.call_read_return(daiwik, "main_function", args.input))
 data['blocks'].append(funcs.call_read_return(daiwik, "bad_tasks", args.input))
