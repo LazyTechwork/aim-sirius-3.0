@@ -42,28 +42,14 @@ data = {
     'blocks': list()
 }
 
-# data['blocks'].append(funcs.call_read_return(funcs, "make_answers_count_block", args.input))
-# data['blocks'].append(funcs.call_read_return(funcs, "make_fraction_for_task_num_block", args.input))
 data['blocks'].append(funcs.call_read_return(kseniia, "optimization", args.input))
 data['blocks'].append(funcs.call_read_return(daiwik, "main_function", args.input))
 data['blocks'].append(funcs.call_read_return(daiwik, "bad_tasks", args.input))
 data['blocks'].append(funcs.call_read_return(harsh_siddharth, "compute_fraction_data", args.input))
 data['blocks'].append(funcs.call_read_return(harsh_siddharth, "compute_attempt_count_data", args.input))
 data['blocks'].append(funcs.call_read_return(harsh_siddharth, "make_fraction_for_task_block", args.input))
-print("Calling function getOlympiadScores")
-f = getattr(gleb, "getOlympiadScores")
-f(args.input, "getOlympiadScores_")
-with open("getOlympiadScores_act_opt.json", "r", encoding='utf-8') as file:
-    obj = json.load(file)
-    obj['id'] = "getOlympiadScores_act_opt"
-    data['blocks'].append(obj)
-os.remove("getOlympiadScores_act_opt.json")
-with open("getOlympiadScores_scores.json", "r", encoding='utf-8') as file:
-    obj = json.load(file)
-    obj['id'] = "getOlympiadScores_scores"
-    data['blocks'].append(obj)
-os.remove("getOlympiadScores_scores.json")
-print("Got result from getOlympiadScores")
+data['blocks'].extend(funcs.call_read_return_multiple(gleb, "getOlympiadScores", args.input, ["act_opt", "scores"]))
+
 print("Making common JSON...")
 
 with open("data.js", "w+", encoding='utf-8') as file:
