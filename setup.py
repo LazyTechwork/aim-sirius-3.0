@@ -88,7 +88,7 @@ def setup():
 
 def specify_path():
     platform, _ = chromedriver_autoinstaller.utils.get_platform_architecture()
-    if platform == 'macos' or platform == 'linux':
+    if platform == 'mac' or platform == 'linux':
         chromedriver_dir = os.getcwd() + "/chromedriver"
         if 'PATH' not in os.environ:
             os.environ['PATH'] = chromedriver_dir
