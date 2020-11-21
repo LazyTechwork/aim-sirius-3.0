@@ -153,16 +153,16 @@ def getOlympiadScores(inputPath, outputPath):
 
     output2 = {}
 
-    output2['10% winners'] = maxw
+    output2['optimal amount of winners'] = maxw
 
-    output2['real 10%'] = actwinners10
+    output2['maximum amount of winners'] = actwinners10
 
-    output2['15% prizers'] = maxp
+    output2['optimal amount of prize getters'] = maxp
 
-    output2['real 15%'] = actprizers15
+    output2['maximum amount of prize getters'] = actprizers15
 
     output2
-    json_result2 = {'title': 'actual25_optimal25',
+    json_result2 = {'title': 'quantity of winners and prize getters',
                     'data_type': 'text_to_value',
                     'render_type': 'color-gradient-asc',
                     'data': output2}
@@ -172,7 +172,7 @@ def getOlympiadScores(inputPath, outputPath):
     output = {}
     for i in basic:
         output[str(i[0])] = i[1]
-    json_result = {'title': 'best_scores_for_tasks',
+    json_result = {'title': 'optimal task scores',
                    'data_type': 'value_for_each_task_number',
                    'render_type': 'color-gradient-asc',
                    'data': output}
